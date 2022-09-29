@@ -109,8 +109,8 @@ ENV/
 env.bak/
 venv.bak/
 
-dev
 .idea
 *.csv
+/*.csv
 .DS_Store
 */.DS_Store

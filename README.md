@@ -1,10 +1,10 @@
 # An LSTM model implemented with PyTorch
 
 This repo is to reproduce the GlueX tracking algorithm, which originally implemented with
- TensorFlow Keras [here](http://localhost:8888/notebooks/GlueX_LSTM_Simpliefied_Pytorch.ipynb),
+ TensorFlow Keras [here](https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_v0.1.ipynb),
  with PyTorch, for a future integration with [phasm](https://github.com/nathanwbrei/phasm).
 
-[The PyTorch code](.) is using the same LSTM network structure as listed below,
+[The PyTorch code](./dev/Simplified_LSTM.py) is using the same LSTM network structure as listed below,
  where batch_size=1256 and seq_len=7.
 The parameter counts of the layers are taken from the original Keras `model.summary()`.
 
