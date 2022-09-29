@@ -4,7 +4,7 @@ This repo is to reproduce the GlueX tracking algorithm, which originally impleme
  TensorFlow Keras [here](http://localhost:8888/notebooks/GlueX_LSTM_Simpliefied_Pytorch.ipynb),
  with PyTorch, for a future integration with [phasm](https://github.com/nathanwbrei/phasm).
 
-[The PyTorch code]() is using the same LSTM network structure as listed below,
+[The PyTorch code](.) is using the same LSTM network structure as listed below,
  where batch_size=1256 and seq_len=7.
 The parameter counts of the layers are taken from the original Keras `model.summary()`.
 
@@ -34,7 +34,7 @@ After sequencing, the dimension of the whole training dataset is (2646573, 7, 6)
  each epoch containing ~2108 batches. We train 100 epochs in total.
 
 #### Early results
-The code is tested with an `ifarm` RTX GPU. Some early results are available now.
+The code is tested with an `ifarm` RTX GPU. Some early results are available.
 - [./res/training-loss](./res/training-loss): images of the losses along the training process.
 - [./res/job-log](./res/job-log): the detailed job logs. An example of
  how losses are changed along the epochs, batches and time is [here](./res/job-log/lstm-farm-full.log).
