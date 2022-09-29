@@ -129,7 +129,7 @@ def train(dataloader, model, loss_fn, optimizer):
         loss.backward()
         optimizer.step()  # update the model parameters
 
-        if batch_id % 2 == 0:
+        if batch_id % 100 == 0:
             loss, error, current = loss.item(), metric_fn(pred, y).item(), batch_id * len(X)
             logging.info(f"batch_id: {batch_id:>6d}, loss: {loss:>7f}, mse: {error:>8f}  [{current:>7d}/{size:>7d}]")
 

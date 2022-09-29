@@ -41,7 +41,7 @@ The code is tested with an `ifarm` RTX GPU. Some early results are available.
 - [./res/evaluation](./res/evaluation): images of the evaluation results.
 
 #### TODO: 
-![training-loss](./res/training-loss/train-loss-full.png)
+![training-loss](./res/training-loss/training-loss.png)
 
 - [ ] Currently, the code does not support adaptive learning rate adjustment, which is
  achieved by `callbacks=[reduce_lr, early_stopping]` in Keras `model.fit()`. As we can find
