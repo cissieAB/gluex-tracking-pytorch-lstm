@@ -4,7 +4,7 @@ This repo is to reproduce the GlueX tracking algorithm, which originally impleme
  TensorFlow Keras [here](https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_v0.1.ipynb),
  with PyTorch, for a future integration with [phasm](https://github.com/nathanwbrei/phasm).
 
-[The PyTorch code](./dev/Simplified_LSTM.py) is using the same LSTM network structure as listed below,
+[The PyTorch code](python/Simplified_LSTM.py) is using the same LSTM network structure as listed below,
  where batch_size=1256 and seq_len=7.
 The parameter counts of the layers are taken from the original Keras `model.summary()`.
 
@@ -17,7 +17,7 @@ The parameter counts of the layers are taken from the original Keras `model.summ
 
 
 
-#### Dataset
+### Dataset
 Download the dataset at the below address.
 
 ```commandline
@@ -33,20 +33,28 @@ As the dataset has changed after the Keras code's implementation, a 100%
 After sequencing, the dimension of the whole training dataset is (2646573, 7, 6), with
  each epoch containing ~2108 batches. We train 100 epochs in total.
 
-#### Early results
+### Early results
 The code is tested with an `ifarm` RTX GPU. Some early results are available.
 - [./res/training-loss](./res/training-loss): images of the losses along the training process.
 - [./res/job-log](./res/job-log): the detailed job logs. An example of
- how losses are changed along the epochs, batches and time is [here](./res/job-log/lstm-full_65185038.log).
+ how losses are changed along the epochs, batches and time is [here](./res/job-log/lstm-full_65238781.log).
 - [./res/evaluation](./res/evaluation): images of the evaluation results.
 
-#### TODO: 
-![training-loss](./res/training-loss/training-loss.png)
+### TODO
+The cuda out-of-memory error at the final evaluation stage, where we
+ try to feed the GPU with the whole validation dataset. Error msg is
+ as below. This might be solved by batching the validation set while
+ copying back the data from GPU to CPU on the fly.
 
-- [ ] Currently, the code does not support adaptive learning rate adjustment, which is
- achieved by `callbacks=[reduce_lr, early_stopping]` in Keras `model.fit()`. As we can find
- in the above figure, for the larger epoch numbers, the loss does not converge well, which
- indicates that we should use smaller learning rate values.
+```python
+preds = model.forward(tensor_val_x.to(device))
+
+# CUDA out of memory. Tried to allocate 11.04 GiB (GPU 0; 23.65 GiB total capacity; 18.20 GiB already allocated;
+# 4.46 GiB free; 18.21 GiB reserved in total by PyTorch)
+# If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.
+# See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+# srun: error: sciml1903: task 0: Exited with exit code 1
+```
 
 ---
 ### References
@@ -56,4 +64,5 @@ The code is tested with an `ifarm` RTX GPU. Some early results are available.
 
 
 ---
-<div style="text-align: right"> Last updated on 09/29/2022 by xmei@jlab.org </div>
+Last updated on 09/30/2022 by xmei@jlab.org
+

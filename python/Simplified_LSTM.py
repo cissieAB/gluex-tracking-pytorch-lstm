@@ -8,10 +8,13 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from sklearn.model_selection import train_test_split
 
+import os
 import logging
 
+SLURM_JID = os.getenv('SLURM_JOB_ID') if os.getenv('SLURM_JOB_ID') else 'current'
+
 logging.basicConfig(
-    filename='lstm-full.log',
+    filename=f'lstm-full_{SLURM_JID}.log',
     filemode='w',
     format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
     level=logging.INFO,
@@ -21,16 +24,19 @@ logging.basicConfig(
 # Tested on farm A100 GPU but failed. It says requiring higher version of libtorch.
 # torch.backends.cuda.matmul.allow_tf32 = True  # for Ampere architecture
 
+EPOCHS = 100
 BATCH_SIZE = 1256
 DATA_DIM = 6
 NN_HIDDEN_DIM = 128
+CLIP_VALUE = 1.0
+DATA_WIDTH = 150
 
 train_csv = pandas.read_csv("train_data.csv")
 train_csv.dropna(inplace=True)
-# train_x = np.array(train_csv)[0:100, :]  # start from small dataset first
-train_x = np.array(train_csv)
+train_x = np.array(train_csv)[0:100, :]  # start from small dataset first
+# train_x = np.array(train_csv)  # of dim (len, 150)
 
-train_data = np.reshape(train_x, (train_x.shape[0], 25, DATA_DIM))
+train_data = np.reshape(train_x, (train_x.shape[0], DATA_WIDTH // DATA_DIM, DATA_DIM))
 
 for i in range(train_data.shape[2]):
     minimum = train_data[:, :, i].min()
@@ -54,6 +60,7 @@ train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.
 train_y = np.squeeze(train_y)
 val_y = np.squeeze(val_y)
 
+# Wrap the data into batched dataloader
 tensor_x, tensor_y = torch.Tensor(train_x), torch.Tensor(train_y)
 tensor_val_x, tensor_val_y = torch.Tensor(val_x), torch.Tensor(val_y)
 
@@ -63,10 +70,16 @@ validation_set = TensorDataset(tensor_val_x, tensor_val_y)
 training_dataloader = DataLoader(training_set, batch_size=BATCH_SIZE)
 validation_dataloader = DataLoader(validation_set, batch_size=BATCH_SIZE)
 
+"""
+#############
+NN structure definition
+############
+"""
+
 
 class LSTMNetwork(nn.Module):
     """
-    Define the LSTM network struture.
+    Define the LSTM network structure.
     """
 
     def __init__(self, data_dim, hidden_dim):
@@ -106,17 +119,26 @@ model = LSTMNetwork(
 ).to(device)
 # print(model)
 
+
+"""
+Training configurations
+"""
 loss_fn = nn.L1Loss()
 metric_fn = nn.MSELoss()
 
-# Simplified optimizer
-# TODO: add adaptive lr later
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer,
+    factor=0.85,
+    patience=5,
+    threshold=1e-5,
+    min_lr=1e-6,
+    verbose=True
+)
 
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
-    model.train()
     for batch_id, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
 
@@ -127,20 +149,19 @@ def train(dataloader, model, loss_fn, optimizer):
         # Backpropagation
         optimizer.zero_grad()  # reset grad to 0
         loss.backward()
+        nn.utils.clip_grad_value_(model.parameters(), clip_value=CLIP_VALUE)
         optimizer.step()  # update the model parameters
 
         if batch_id % 100 == 0:
             loss, error, current = loss.item(), metric_fn(pred, y).item(), batch_id * len(X)
-            logging.info(f"batch_id: {batch_id:>6d}, loss: {loss:>7f}, mse: {error:>8f}  [{current:>7d}/{size:>7d}]")
+            logging.info(f"batch_id: {batch_id:>6d}, loss: {loss:>7f}, mse: {error:>7f}  [{current:>8d}/{size:>8d}]")
 
     loss, mse = loss.item(), metric_fn(pred, y)
     return loss, mse
 
 
 def validate(dataloader, model, loss_fn):
-    size = len(dataloader.dataset)
     num_batches = len(dataloader)
-    model.eval()
     val_loss = 0
     with torch.no_grad():
         for X, y in dataloader:
@@ -153,14 +174,24 @@ def validate(dataloader, model, loss_fn):
     return val_loss, val_mse
 
 
-epochs = 100
+"""
+#######################
+The training process
+#######################
+"""
+epochs = EPOCHS
 his_loss, his_mse, his_val_loss, his_val_mse = [], [], [], []
 
 for t in range(epochs):
     loss, mse = train(training_dataloader, model, loss_fn, optimizer)
     val_loss, val_mse = validate(validation_dataloader, model, loss_fn)
-    print(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>8f}, val_loss={val_loss:>7f}, val_mse={val_mse:>8f}")
-    logging.info(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>8f}, val_loss={val_loss:>7f}, val_mse={val_mse:>8f}\n")
+
+    print(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>7f}, val_loss={val_loss:>7f}, val_mse={val_mse:>7f}, "
+          f"lr={optimizer.param_groups[0]['lr']}")
+    logging.info(
+        f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>7f}, val_loss={val_loss:>7f}, val_mse={val_mse:>7f}, lr={optimizer.param_groups[0]['lr']}\n")
+
+    scheduler.step(val_loss)   # adjust lr based on val_loss
 
     his_loss.append(loss)
     his_mse.append(mse)
@@ -180,29 +211,38 @@ plt.ylabel('L1 loss (log scale)')
 plt.margins(0.05)
 plt.subplots_adjust(left=0.2)
 plt.title('Losses of the training process')
-plt.savefig('./training-loss.png')
+plt.savefig(f"./training-loss_{SLURM_JID}.png")
 
 """
 Evaluation with the whole evaluation dataset
-"""
-preds = model.forward(tensor_val_x.to(device))
-# print(f"preds.shape={preds.shape}", f"tensor_val_y.shape={tensor_val_y.shape}")
-diff = (tensor_val_y.to(device) - preds).cpu().detach().numpy()  # convert to a numpy array
 
-plt.rcParams.update({'font.size': 15})
-labels = ['x', 'y', 'z', 'px', 'py', 'pz']
-fig, ax = plt.subplots(2, 3, figsize=(25, 10))
-fig.suptitle('Model evaluation with the full validation dataset')
-for i in range(6):
-    row_id, col_id = i // 3, i % 3
-    ax[row_id, col_id].hist(
-        diff[:, i],
-        weights=100 * np.ones(len(diff[:, i])) / len(diff[:, i]),
-        label=labels[i]
-    )
-    ax[row_id, col_id].legend()
-fig.text(0.5, 0.04, 'Difference between predictions and truth', ha='center')
-fig.text(0, 0.5, 'Percentage (%)', va='center', rotation='vertical')
-plt.savefig('./evaluation-error-percentage.png')
+Commented because of cuda out-of-memory error
+"""
+# CUDA out of memory. Tried to allocate 11.04 GiB (GPU 0; 23.65 GiB total capacity; 18.20 GiB already allocated;
+# 4.46 GiB free; 18.21 GiB reserved in total by PyTorch)
+# If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.
+# See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+# srun: error: sciml1903: task 0: Exited with exit code 1
+
+# preds = model.forward(tensor_val_x.to(device))
+# # print(f"preds.shape={preds.shape}", f"tensor_val_y.shape={tensor_val_y.shape}")
+# diff = (tensor_val_y.to(device) - preds).cpu().detach().numpy()  # convert to a numpy array
+#
+# plt.rcParams.update({'font.size': 15})
+# labels = ['x', 'y', 'z', 'px', 'py', 'pz']
+# fig, ax = plt.subplots(2, 3, figsize=(15, 10))
+# fig.suptitle('Model evaluation with the full validation dataset')
+# for i in range(6):
+#     row_id, col_id = i // 3, i % 3
+#     ax[row_id, col_id].hist(
+#         diff[:, i],
+#         weights=100 * np.ones(len(diff[:, i])) / len(diff[:, i]),
+#         label=labels[i]
+#     )
+#     ax[row_id, col_id].legend()
+# fig.text(0.5, 0.04, 'Difference between predictions and truth', ha='center')
+# fig.text(0.04, 0.5, 'Percentage counts (%)', va='center', rotation='vertical')
+# plt.subplots_adjust(left=0.08)
+# plt.savefig(f"./evaluation-error-percentage_{SLURM_JID}.png")
 
 # TODO: save the model params and tmp data

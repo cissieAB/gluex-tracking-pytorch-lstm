@@ -110,6 +110,7 @@ env.bak/
 venv.bak/
 
 .idea
+job_*
 *.csv
 /*.csv
 .DS_Store
