@@ -37,7 +37,7 @@ After sequencing, the dimension of the whole training dataset is (2646573, 7, 6)
 The code is tested with an `ifarm` RTX GPU. Some early results are available.
 - [./res/training-loss](./res/training-loss): images of the losses along the training process.
 - [./res/job-log](./res/job-log): the detailed job logs. An example of
- how losses are changed along the epochs, batches and time is [here](./res/job-log/lstm-farm-full.log).
+ how losses are changed along the epochs, batches and time is [here](./res/job-log/lstm-full_65185038.log).
 - [./res/evaluation](./res/evaluation): images of the evaluation results.
 
 #### TODO: 

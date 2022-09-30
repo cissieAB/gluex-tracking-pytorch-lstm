@@ -9,6 +9,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from sklearn.model_selection import train_test_split
 
 import logging
+
 logging.basicConfig(
     filename='lstm-full.log',
     filemode='w',
@@ -26,21 +27,21 @@ NN_HIDDEN_DIM = 128
 
 train_csv = pandas.read_csv("train_data.csv")
 train_csv.dropna(inplace=True)
-train_x = np.array(train_csv)[0:100, :]  # start from small dataset first
-# train_x = np.array(train_csv)
+# train_x = np.array(train_csv)[0:100, :]  # start from small dataset first
+train_x = np.array(train_csv)
 
-train_data = np.reshape(train_x, (train_x.shape[0], 25, 6))
+train_data = np.reshape(train_x, (train_x.shape[0], 25, DATA_DIM))
 
 for i in range(train_data.shape[2]):
     minimum = train_data[:, :, i].min()
     maximum = train_data[:, :, i].max()
-    train_data[:, :, i] = (train_data[:, :, i] - minimum) / (maximum-minimum)
+    train_data[:, :, i] = (train_data[:, :, i] - minimum) / (maximum - minimum)
 
 train_x = []
 train_y = []
 for i in range(17):
-    xs = train_data[:, i:7+i, :]
-    ys = train_data[:, 7+i:8+i, :]
+    xs = train_data[:, i:7 + i, :]
+    ys = train_data[:, 7 + i:8 + i, :]
     train_x.extend(xs)
     train_y.extend(ys)
 
@@ -53,11 +54,10 @@ train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.
 train_y = np.squeeze(train_y)
 val_y = np.squeeze(val_y)
 
-
 tensor_x, tensor_y = torch.Tensor(train_x), torch.Tensor(train_y)
 tensor_val_x, tensor_val_y = torch.Tensor(val_x), torch.Tensor(val_y)
 
-training_set = TensorDataset(tensor_x,tensor_y)
+training_set = TensorDataset(tensor_x, tensor_y)
 validation_set = TensorDataset(tensor_val_x, tensor_val_y)
 
 training_dataloader = DataLoader(training_set, batch_size=BATCH_SIZE)
@@ -159,14 +159,13 @@ his_loss, his_mse, his_val_loss, his_val_mse = [], [], [], []
 for t in range(epochs):
     loss, mse = train(training_dataloader, model, loss_fn, optimizer)
     val_loss, val_mse = validate(validation_dataloader, model, loss_fn)
-    print(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>8f}, val_loss={val_loss:>7f}, val_mse={val_mse:>7f}")
-    logging.info(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>8f}, val_loss={val_loss:>7f}, val_mse={val_mse:>7f}")
+    print(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>8f}, val_loss={val_loss:>7f}, val_mse={val_mse:>8f}")
+    logging.info(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>8f}, val_loss={val_loss:>7f}, val_mse={val_mse:>8f}\n")
 
     his_loss.append(loss)
     his_mse.append(mse)
     his_val_loss.append(val_loss)
     his_val_mse.append(val_mse)
-
 
 """
 Some visualization
@@ -183,26 +182,27 @@ plt.subplots_adjust(left=0.2)
 plt.title('Losses of the training process')
 plt.savefig('./training-loss.png')
 
-
 """
 Evaluation with the whole evaluation dataset
 """
-preds = model.forward(tensor_val_x)
+preds = model.forward(tensor_val_x.to(device))
 # print(f"preds.shape={preds.shape}", f"tensor_val_y.shape={tensor_val_y.shape}")
-diff = (tensor_val_y - preds).detach().numpy()  # convert to a numpy array
+diff = (tensor_val_y.to(device) - preds).cpu().detach().numpy()  # convert to a numpy array
 
 plt.rcParams.update({'font.size': 15})
 labels = ['x', 'y', 'z', 'px', 'py', 'pz']
-fig, ax = plt.subplots(2, 3, figsize=(25, 6))
+fig, ax = plt.subplots(2, 3, figsize=(25, 10))
 fig.suptitle('Model evaluation with the full validation dataset')
 for i in range(6):
     row_id, col_id = i // 3, i % 3
-    # TODO: change y-axis to percentage
-    ax[row_id, col_id].hist(diff[:, i], weights=np.ones(len(diff[:, i])) / len(diff[:, i]), label=labels[i])
+    ax[row_id, col_id].hist(
+        diff[:, i],
+        weights=100 * np.ones(len(diff[:, i])) / len(diff[:, i]),
+        label=labels[i]
+    )
     ax[row_id, col_id].legend()
 fig.text(0.5, 0.04, 'Difference between predictions and truth', ha='center')
-fig.text(0.04, 0.5, 'Percentage (%)', va='center', rotation='vertical')
+fig.text(0, 0.5, 'Percentage (%)', va='center', rotation='vertical')
 plt.savefig('./evaluation-error-percentage.png')
-
 
 # TODO: save the model params and tmp data
