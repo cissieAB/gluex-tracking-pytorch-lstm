@@ -22,6 +22,7 @@ EPOCHS = 100
 HIDDEN_DIM = 128
 
 MODEL_STATE_DICT_PATH = 'model_state_dict.pt'
+MODEL_TORCH_SCRIPT_PATH = 'model_scripted.pt'
 
 # wget https://halldweb.jlab.org/talks/ML_lunch/Sep2019/MLchallenge2_training.csv
 # mv MLchallenge2_training.csv train_data.csv

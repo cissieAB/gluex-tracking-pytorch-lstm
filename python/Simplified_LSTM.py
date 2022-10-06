@@ -4,7 +4,8 @@ https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_
 
 Observed differences:
 - The training dataset is larger than that in the referred demonstrated jupyter notebook.
-- Looks like the referred Keras notebook runs faster than this code :(. Larger dataset might be a reason.
+- Looks like the referred Keras notebook runs faster than this code :(. Larger dataset might be a reason, but there
+ should be more.
 - The final PyTorch loss & val_loss seems better, and the final PyTorch lr is larger.
 
 Some notes:
@@ -110,7 +111,7 @@ class Net:
 
     def train(self, train_dataloader, val_dataloader):
         his = {'loss': [], 'mse': [], 'val_loss': [], 'val_mse': []}
-        logging.info("Training started.\n\n")
+        logging.info("Training started.\n")
 
         for it in range(self.epochs):
             loss, mse = self.step(train_dataloader)
@@ -168,7 +169,7 @@ Save the model into TorchScript
 Comment out because it does not work on farm well.
 Besides, to save/load TorchScript seems to get large validation error
 """
-# print("\n#########################################")
-# model_scripted = torch.jit.script(net.model)  # Export to TorchScript
-# print("TorchScript: \n", model_scripted.code, "\n", model_scripted.graph)
-# model_scripted.save('model_scripted.pt')  # Save the TorchScript
+print("\n#########################################")
+model_scripted = torch.jit.script(net.model)  # Export to TorchScript
+print("TorchScript: \n", model_scripted.code, "\n", model_scripted.graph)
+model_scripted.save('model_scripted.pt')  # Save the TorchScript

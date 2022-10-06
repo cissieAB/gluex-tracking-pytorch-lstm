@@ -33,15 +33,11 @@ After sequencing, the dimension of the whole training dataset (as on 09/30/2022)
 
 ## Results
 
-[//]: # (Figure: the training loss on a T4 GPU)
-
-[//]: # (![training-loss-T4]&#40;./res/training-loss/training-loss_65506053_T4.png&#41;)
-
 Table: the results after 100 training epochs
 
 | Exp              | `loss`   | `mse`      | `val_loss` | `val_mse`  | `lr`        |     Time | Training `X` size |
 |:-----------------|:---------|:-----------|:-----------|:-----------|:------------|---------:|------------------:|
-| Keras TitanRTX*2 | 0.0015   | 6.8281e-06 | 0.0018     | 7.2508e-06 | 3.7715e-05  | ~20 mins |   (1910698, 7, 6) |
+| Keras TitanRTX*2 | 0.0015   | 6.8281e-06 | 0.0018     | 7.2508e-06 | 3.7715e-05  | ~15 mins |   (1910698, 7, 6) |
 | PyTorch TitanRTX | 0.000957 | 0.000007   | 0.000988   | 0.000002   | 5.22006e-05 | ~50 mins |   (2646573, 7, 6) |
 | PyTorch T4       | 0.001056 | 1.7273e-06 | 0.000971   | 2.3378e-06 | 5.22006e-05 | ~60 mins |   (2646573, 7, 6) |
 

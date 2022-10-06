@@ -10,7 +10,8 @@ import logging
 import torch
 from matplotlib import pyplot as plt
 
-from utils import validation_dataloader, DATA_DIM, BATCH_SIZE, HIDDEN_DIM, LSTMNetwork, MODEL_STATE_DICT_PATH
+from utils import validation_dataloader, DATA_DIM, BATCH_SIZE, HIDDEN_DIM, LSTMNetwork, \
+    MODEL_STATE_DICT_PATH, MODEL_TORCH_SCRIPT_PATH
 
 SLURM_JID = os.getenv('SLURM_JOB_ID') if os.getenv('SLURM_JOB_ID') else 'current'
 logging.basicConfig(
@@ -21,8 +22,18 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-model = LSTMNetwork(DATA_DIM, HIDDEN_DIM)
-model.load_state_dict(torch.load(MODEL_STATE_DICT_PATH))
+"""
+Load model via model.state_dict
+"""
+# model = LSTMNetwork(DATA_DIM, HIDDEN_DIM)
+# model.load_state_dict(torch.load(MODEL_STATE_DICT_PATH))
+
+"""
+Load model via TorchScript
+"""
+model = torch.jit.load(MODEL_TORCH_SCRIPT_PATH)
+
+
 model.eval()  # necessary
 
 # The below two numpy arrays live on CPU
@@ -60,7 +71,7 @@ Visualization
 """
 plt.rcParams.update({'font.size': 15})
 labels = ['x', 'y', 'z', 'px', 'py', 'pz']
-fig, ax = plt.subplots(2, 3, figsize=(15, 10), sharex=True, sharey=True)
+fig, ax = plt.subplots(2, 3, figsize=(15, 10), sharey=True)
 fig.suptitle('Model evaluation with the full validation dataset')
 for i in range(6):
     row_id, col_id = i // 3, i % 3
@@ -86,10 +97,9 @@ On TitanRTX
 # srun: error: sciml1903: task 0: Exited with exit code 1
 
 On T4
-RuntimeError: CUDA out of memory. 
-Tried to allocate 14.51 GiB (GPU 0; 14.76 GiB total capacity; 3.37 GiB already allocated; 
-10.49 GiB free; 3.37 GiB reserved in total by PyTorch) 
-If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation. 
-See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
-
+# RuntimeError: CUDA out of memory. 
+# Tried to allocate 14.51 GiB (GPU 0; 14.76 GiB total capacity; 3.37 GiB already allocated; 
+# 10.49 GiB free; 3.37 GiB reserved in total by PyTorch) 
+# If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation. 
+# See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
 """
