@@ -164,8 +164,11 @@ print(f"Save model.state_dict() to {MODEL_STATE_DICT_PATH}\n")
 
 """
 Save the model into TorchScript
+
+Comment out because it does not work on farm well.
+Besides, to save/load TorchScript seems to get large validation error
 """
-print("\n#########################################")
-model_scripted = torch.jit.script(net.model)  # Export to TorchScript
-print("TorchScript: \n", model_scripted.code, "\n", model_scripted.graph)
-model_scripted.save('model_scripted.pt')  # Save the TorchScript
+# print("\n#########################################")
+# model_scripted = torch.jit.script(net.model)  # Export to TorchScript
+# print("TorchScript: \n", model_scripted.code, "\n", model_scripted.graph)
+# model_scripted.save('model_scripted.pt')  # Save the TorchScript

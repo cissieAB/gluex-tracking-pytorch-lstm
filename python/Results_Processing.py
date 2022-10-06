@@ -25,15 +25,19 @@ model = LSTMNetwork(DATA_DIM, HIDDEN_DIM)
 model.load_state_dict(torch.load(MODEL_STATE_DICT_PATH))
 model.eval()  # necessary
 
+# The below two numpy arrays live on CPU
 pred_all = np.zeros((len(validation_dataloader.dataset), DATA_DIM))
 y_all = np.zeros((len(validation_dataloader.dataset), DATA_DIM))
 
 print("\n###########################################")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = model.to(device)
-print(f"Start inference on {device}")
+
 loss_fn = torch.nn.L1Loss()
 loss_sum = 0.0
+
+print(f"Start inference on {device}")
+logging.info(f"Start inference on {device}")
 with torch.no_grad():
     for batch_id, (X, y) in enumerate(validation_dataloader):
         pred = model(X.to(device)).cpu()
