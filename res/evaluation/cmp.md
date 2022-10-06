@@ -6,4 +6,6 @@ Figure 1: the model error with $epochs=1$
 
 ---
 
-Figure 2: the model error with $epochs=100$
+Figure 2: the model error with $epochs=100$ on a T4 GPU
+
+![epoch_100](evaluation-100_epoch_65512103_T4.png)
