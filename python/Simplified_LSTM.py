@@ -1,248 +1,171 @@
-import numpy as np
-import pandas
-from matplotlib import pyplot as plt
+"""
+Mimic the Keras LSTM code at
+https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_v0.1.ipynb
+
+Observed differences:
+- The training dataset is larger than that in the referred demonstrated jupyter notebook.
+- Looks like the referred Keras notebook runs faster than this code :(. Larger dataset might be a reason.
+- The final PyTorch loss & val_loss seems better, and the final PyTorch lr is larger.
+
+Some notes:
+- Tested on a single TitanRTX or a single T4.
+  1 TitanRTX takes ~47 minutes to complete the training process.
+- Tested on farm A100 GPU but failed. It says requiring higher version of libtorch.
+
+mailto: xmei@jlab.org, 10/05/2022
+"""
+
+import logging
+import os
 
 import torch
+from matplotlib import pyplot as plt
 from torch import nn
-from torch.utils.data import TensorDataset, DataLoader
 
-from sklearn.model_selection import train_test_split
+from utils import training_dataloader, validation_dataloader, DATA_DIM, HIDDEN_DIM, EPOCHS, MODEL_STATE_DICT_PATH, \
+    LSTMNetwork
 
-import os
-import logging
+# torch.backends.cuda.matmul.allow_tf32 = True  # for Ampere architecture
 
+"""
+Logging configuration
+"""
 SLURM_JID = os.getenv('SLURM_JOB_ID') if os.getenv('SLURM_JOB_ID') else 'current'
-
 logging.basicConfig(
-    filename=f'lstm-full_{SLURM_JID}.log',
+    filename=f'training-full_{SLURM_JID}.log',
     filemode='w',
     format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-# Tested on farm A100 GPU but failed. It says requiring higher version of libtorch.
-# torch.backends.cuda.matmul.allow_tf32 = True  # for Ampere architecture
-
-EPOCHS = 100
-BATCH_SIZE = 1256
-DATA_DIM = 6
-NN_HIDDEN_DIM = 128
-CLIP_VALUE = 1.0
-DATA_WIDTH = 150
-
-train_csv = pandas.read_csv("train_data.csv")
-train_csv.dropna(inplace=True)
-train_x = np.array(train_csv)[0:100, :]  # start from small dataset first
-# train_x = np.array(train_csv)  # of dim (len, 150)
-
-train_data = np.reshape(train_x, (train_x.shape[0], DATA_WIDTH // DATA_DIM, DATA_DIM))
-
-for i in range(train_data.shape[2]):
-    minimum = train_data[:, :, i].min()
-    maximum = train_data[:, :, i].max()
-    train_data[:, :, i] = (train_data[:, :, i] - minimum) / (maximum - minimum)
-
-train_x = []
-train_y = []
-for i in range(17):
-    xs = train_data[:, i:7 + i, :]
-    ys = train_data[:, 7 + i:8 + i, :]
-    train_x.extend(xs)
-    train_y.extend(ys)
-
-train_x = np.array(train_x)
-train_y = np.array(train_y)
-# print(train_x.shape, train_y.shape)
-
-# Split the training and validation set
-train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2)
-train_y = np.squeeze(train_y)
-val_y = np.squeeze(val_y)
-
-# Wrap the data into batched dataloader
-tensor_x, tensor_y = torch.Tensor(train_x), torch.Tensor(train_y)
-tensor_val_x, tensor_val_y = torch.Tensor(val_x), torch.Tensor(val_y)
-
-training_set = TensorDataset(tensor_x, tensor_y)
-validation_set = TensorDataset(tensor_val_x, tensor_val_y)
-
-training_dataloader = DataLoader(training_set, batch_size=BATCH_SIZE)
-validation_dataloader = DataLoader(validation_set, batch_size=BATCH_SIZE)
-
-"""
-#############
-NN structure definition
-############
-"""
+NN_CLIP_VALUE = 1.0
 
 
-class LSTMNetwork(nn.Module):
-    """
-    Define the LSTM network structure.
-    """
+class Net:
 
-    def __init__(self, data_dim, hidden_dim):
-        super(LSTMNetwork, self).__init__()
+    def __init__(self, data_dim=DATA_DIM, hidden_dim=HIDDEN_DIM, epochs=EPOCHS):
+        """
+        Configurations of the training process
+        """
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"Training on {self.device} device")
 
-        self.hidden_size = hidden_dim
-        self.data_dim = data_dim
+        self.model = LSTMNetwork(data_dim, hidden_dim).to(self.device)
+        # print(self.model)
 
-        # Pytorch LSTM ref: https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
-        # By default, PyTorch LSTM's return_sequences=True while for Keras, return_sequences=False,
-        # The difference and conversion between them is given \
-        # at https://stackoverflow.com/questions/62204109/return-sequences-false-equivalent-in-pytorch-lstm
-        self.layer_lstm1 = nn.LSTM(self.data_dim, self.hidden_size, batch_first=True)
-        self.layer_lstm2 = nn.LSTM(self.hidden_size, 64, batch_first=True)
-        self.layer_lstm3 = nn.LSTM(64, 32, batch_first=True)
-        self.layer_output = nn.Linear(32, self.data_dim)
+        self.loss_fn = nn.L1Loss()
+        self.metric_fn = nn.MSELoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-4)
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer,
+            factor=0.85,
+            patience=5,
+            threshold=1e-5,
+            min_lr=1e-6,
+            verbose=True
+        )
 
-    def forward(self, x):
-        # Three LSTM layers, the h/c tensors are by default initialized as zeros
-        out, _ = self.layer_lstm1(x)
-        out, _ = self.layer_lstm2(out)
-        out, _ = self.layer_lstm3(out)
-        out = out[:, -1, :]  # mapping return_sequences=False for layer lstm3, note batch_first=True
+        self.epochs = epochs
 
-        # Linear output layer
-        out = self.layer_output(out)
+    def step(self, dataloader):
+        num_batches = len(dataloader)
+        size = len(dataloader.dataset)
+        pred, loss_sum = 0.0, 0.0
 
-        return out
+        for batch_id, (X, y) in enumerate(dataloader):
+            X, y = X.to(self.device), y.to(self.device)
+
+            # Back propagation
+            pred = self.model(X)
+            loss = self.loss_fn(pred, y)
+            loss_sum += loss.item()
+            self.optimizer.zero_grad()  # reset grad to 0
+            loss.backward()
+            nn.utils.clip_grad_value_(self.model.parameters(), clip_value=NN_CLIP_VALUE)
+            self.optimizer.step()  # update the model parameters
+
+            if batch_id % 100 == 0:  # logging
+                loss, metric, current = loss.item(), self.metric_fn(pred, y).item(), batch_id * len(X)
+                logging.info(f"batch_id: {batch_id:>5d}, loss: {loss}, mse: {metric}  [{current:>8d}/{size:>8d}]")
+
+        l1_loss = loss_sum / num_batches
+        mse = self.metric_fn(pred, y).item()  # because final batch_id is not multiple of 100
+        # print("step", l1_loss, mse)
+        return l1_loss, mse  # return float, not tensor
+
+    def validate(self, dataloader):
+        num_batches = len(dataloader)
+        val_loss = 0.0
+        with torch.no_grad():
+            for X, y in dataloader:
+                X, y = X.to(self.device), y.to(self.device)
+                pred = self.model(X)
+                val_loss += self.loss_fn(pred, y).item()
+
+        val_loss /= num_batches
+        val_mse = self.metric_fn(pred, y).item()
+        # print("validate", val_loss, val_mse)
+        return val_loss, val_mse
+
+    def train(self, train_dataloader, val_dataloader):
+        his = {'loss': [], 'mse': [], 'val_loss': [], 'val_mse': []}
+        logging.info("Training started.\n\n")
+
+        for it in range(self.epochs):
+            loss, mse = self.step(train_dataloader)
+            val_loss, val_mse = self.validate(val_dataloader)
+
+            print(f"Epoch {it + 1:>4d}: loss={loss}, mse={mse}, val_loss={val_loss}, val_mse={val_mse}, "
+                  f"lr={self.optimizer.param_groups[0]['lr']}")
+            logging.info(
+                f"Epoch {it + 1:>4d}: loss={loss}, mse={mse}, val_loss={val_loss}, val_mse={val_mse}, lr={self.optimizer.param_groups[0]['lr']}\n")
+
+            self.scheduler.step(val_loss)  # adjust lr based on val_loss
+
+            his['loss'].append(loss)
+            his['mse'].append(mse)
+            his['val_loss'].append(val_loss)
+            his['val_mse'].append(val_mse)
+
+        logging.info("Training stopped. \n\n")
+        return his
 
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using {device} device")
-
-model = LSTMNetwork(
-    data_dim=DATA_DIM,
-    hidden_dim=NN_HIDDEN_DIM
-).to(device)
-# print(model)
-
+print(f"Torch version {torch.__version__}")
+net = Net()
+his = net.train(training_dataloader, validation_dataloader)
 
 """
-Training configurations
-"""
-loss_fn = nn.L1Loss()
-metric_fn = nn.MSELoss()
-
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-    optimizer,
-    factor=0.85,
-    patience=5,
-    threshold=1e-5,
-    min_lr=1e-6,
-    verbose=True
-)
-
-
-def train(dataloader, model, loss_fn, optimizer):
-    size = len(dataloader.dataset)
-    for batch_id, (X, y) in enumerate(dataloader):
-        X, y = X.to(device), y.to(device)
-
-        # Compute prediction error
-        pred = model(X)
-        loss = loss_fn(pred, y)
-
-        # Backpropagation
-        optimizer.zero_grad()  # reset grad to 0
-        loss.backward()
-        nn.utils.clip_grad_value_(model.parameters(), clip_value=CLIP_VALUE)
-        optimizer.step()  # update the model parameters
-
-        if batch_id % 100 == 0:
-            loss, error, current = loss.item(), metric_fn(pred, y).item(), batch_id * len(X)
-            logging.info(f"batch_id: {batch_id:>6d}, loss: {loss:>7f}, mse: {error:>7f}  [{current:>8d}/{size:>8d}]")
-
-    loss, mse = loss.item(), metric_fn(pred, y)
-    return loss, mse
-
-
-def validate(dataloader, model, loss_fn):
-    num_batches = len(dataloader)
-    val_loss = 0
-    with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to(device), y.to(device)
-            pred = model(X)
-            val_loss += loss_fn(pred, y).item()
-
-    val_loss /= num_batches
-    val_mse = metric_fn(pred, y).item()
-    return val_loss, val_mse
-
-
-"""
-#######################
-The training process
-#######################
-"""
-epochs = EPOCHS
-his_loss, his_mse, his_val_loss, his_val_mse = [], [], [], []
-
-for t in range(epochs):
-    loss, mse = train(training_dataloader, model, loss_fn, optimizer)
-    val_loss, val_mse = validate(validation_dataloader, model, loss_fn)
-
-    print(f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>7f}, val_loss={val_loss:>7f}, val_mse={val_mse:>7f}, "
-          f"lr={optimizer.param_groups[0]['lr']}")
-    logging.info(
-        f"Epoch {t + 1:>4d}: loss={loss:>7f}, mse={mse:>7f}, val_loss={val_loss:>7f}, val_mse={val_mse:>7f}, lr={optimizer.param_groups[0]['lr']}\n")
-
-    scheduler.step(val_loss)   # adjust lr based on val_loss
-
-    his_loss.append(loss)
-    his_mse.append(mse)
-    his_val_loss.append(val_loss)
-    his_val_mse.append(val_mse)
-
-"""
-Some visualization
+Visualization of the training process
 """
 fig, ax = plt.subplots()
-plt.plot(his_loss, label="loss")
-plt.plot(his_val_loss, label="val_loss")
+plt.plot(his['loss'], label="loss")
+plt.plot(his['val_loss'], label="val_loss")
 plt.yscale("log")
 plt.legend()
 plt.xlabel('Epochs')
 plt.ylabel('L1 loss (log scale)')
 plt.margins(0.05)
 plt.subplots_adjust(left=0.2)
-plt.title('Losses of the training process')
+plt.title('The L1 loss along the training process')
 plt.savefig(f"./training-loss_{SLURM_JID}.png")
 
 """
-Evaluation with the whole evaluation dataset
-
-Commented because of cuda out-of-memory error
+Save the model params
 """
-# CUDA out of memory. Tried to allocate 11.04 GiB (GPU 0; 23.65 GiB total capacity; 18.20 GiB already allocated;
-# 4.46 GiB free; 18.21 GiB reserved in total by PyTorch)
-# If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.
-# See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
-# srun: error: sciml1903: task 0: Exited with exit code 1
+print("\n#########################################")
+print(net.model, "\n")
+print("Model's state_dict:")
+for param_tensor in net.model.state_dict():
+    print("\t", param_tensor, "\t", net.model.state_dict()[param_tensor].size())
+torch.save(net.model.state_dict(), MODEL_STATE_DICT_PATH)
+print(f"Save model.state_dict() to {MODEL_STATE_DICT_PATH}\n")
 
-# preds = model.forward(tensor_val_x.to(device))
-# # print(f"preds.shape={preds.shape}", f"tensor_val_y.shape={tensor_val_y.shape}")
-# diff = (tensor_val_y.to(device) - preds).cpu().detach().numpy()  # convert to a numpy array
-#
-# plt.rcParams.update({'font.size': 15})
-# labels = ['x', 'y', 'z', 'px', 'py', 'pz']
-# fig, ax = plt.subplots(2, 3, figsize=(15, 10))
-# fig.suptitle('Model evaluation with the full validation dataset')
-# for i in range(6):
-#     row_id, col_id = i // 3, i % 3
-#     ax[row_id, col_id].hist(
-#         diff[:, i],
-#         weights=100 * np.ones(len(diff[:, i])) / len(diff[:, i]),
-#         label=labels[i]
-#     )
-#     ax[row_id, col_id].legend()
-# fig.text(0.5, 0.04, 'Difference between predictions and truth', ha='center')
-# fig.text(0.04, 0.5, 'Percentage counts (%)', va='center', rotation='vertical')
-# plt.subplots_adjust(left=0.08)
-# plt.savefig(f"./evaluation-error-percentage_{SLURM_JID}.png")
-
-# TODO: save the model params and tmp data
+"""
+Save the model into TorchScript
+"""
+print("\n#########################################")
+model_scripted = torch.jit.script(net.model)  # Export to TorchScript
+print("TorchScript: \n", model_scripted.code, "\n", model_scripted.graph)
+model_scripted.save('model_scripted.pt')  # Save the TorchScript

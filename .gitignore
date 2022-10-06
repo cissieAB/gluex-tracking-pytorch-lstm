@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*/__pycache__
 *.py[cod]
 *$py.class
 
@@ -112,6 +113,7 @@ venv.bak/
 .idea
 job_*
 *.csv
-/*.csv
+*/*.csv
+*/*.pt
 .DS_Store
 */.DS_Store
