@@ -10,8 +10,7 @@ import logging
 import torch
 from matplotlib import pyplot as plt
 
-from utils import validation_dataloader, DATA_DIM, BATCH_SIZE, HIDDEN_DIM, LSTMNetwork, \
-    MODEL_STATE_DICT_PATH, MODEL_TORCH_SCRIPT_PATH
+from utils import validation_dataloader, DATA_DIM, BATCH_SIZE, MODEL_TORCH_SCRIPT_PATH
 
 SLURM_JID = os.getenv('SLURM_JOB_ID') if os.getenv('SLURM_JOB_ID') else 'current'
 logging.basicConfig(
@@ -24,6 +23,8 @@ logging.basicConfig(
 
 """
 Load model via model.state_dict
+
+No need now since we are loading TorchScript now.
 """
 # model = LSTMNetwork(DATA_DIM, HIDDEN_DIM)
 # model.load_state_dict(torch.load(MODEL_STATE_DICT_PATH))

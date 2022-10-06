@@ -6,11 +6,10 @@ Observed differences:
 - The training dataset is larger than that in the referred demonstrated jupyter notebook.
 - Looks like the referred Keras notebook runs faster than this code :(. Larger dataset might be a reason, but there
  should be more.
-- The final PyTorch loss & val_loss seems better, and the final PyTorch lr is larger.
 
 Some notes:
 - Tested on a single TitanRTX or a single T4.
-  1 TitanRTX takes ~47 minutes to complete the training process.
+  1 TitanRTX takes ~50 minutes to complete the training process.
 - Tested on farm A100 GPU but failed. It says requiring higher version of libtorch.
 
 mailto: xmei@jlab.org, 10/05/2022
@@ -23,8 +22,9 @@ import torch
 from matplotlib import pyplot as plt
 from torch import nn
 
-from utils import training_dataloader, validation_dataloader, DATA_DIM, HIDDEN_DIM, EPOCHS, MODEL_STATE_DICT_PATH, \
-    LSTMNetwork
+from utils import training_dataloader, validation_dataloader, \
+    DATA_DIM, HIDDEN_DIM, EPOCHS, BATCH_SIZE, \
+    MODEL_STATE_DICT_PATH, MODEL_TORCH_SCRIPT_PATH, LSTMNetwork
 
 # torch.backends.cuda.matmul.allow_tf32 = True  # for Ampere architecture
 
@@ -72,45 +72,48 @@ class Net:
     def step(self, dataloader):
         num_batches = len(dataloader)
         size = len(dataloader.dataset)
-        pred, loss_sum = 0.0, 0.0
+        pred, loss_sum, mse_sum = 0.0, 0.0, 0.0
 
         for batch_id, (X, y) in enumerate(dataloader):
             X, y = X.to(self.device), y.to(self.device)
 
-            # Back propagation
             pred = self.model(X)
-            loss = self.loss_fn(pred, y)
-            loss_sum += loss.item()
+            cur_loss, cur_metric = self.loss_fn(pred, y), self.metric_fn(pred, y)
+            loss_sum += cur_loss.item()
+            mse_sum += cur_metric.item()
+
+            # Back propagation
             self.optimizer.zero_grad()  # reset grad to 0
-            loss.backward()
+            cur_loss.backward()
             nn.utils.clip_grad_value_(self.model.parameters(), clip_value=NN_CLIP_VALUE)
             self.optimizer.step()  # update the model parameters
 
             if batch_id % 100 == 0:  # logging
-                loss, metric, current = loss.item(), self.metric_fn(pred, y).item(), batch_id * len(X)
-                logging.info(f"batch_id: {batch_id:>5d}, loss: {loss}, mse: {metric}  [{current:>8d}/{size:>8d}]")
+                current = batch_id * BATCH_SIZE
+                logging.info(f"batch_id: {batch_id:>5d}, cur_loss: {cur_loss}, cur_mse: {cur_metric}  [{current:>8d}/{size:>8d}]")
 
-        l1_loss = loss_sum / num_batches
-        mse = self.metric_fn(pred, y).item()  # because final batch_id is not multiple of 100
-        # print("step", l1_loss, mse)
-        return l1_loss, mse  # return float, not tensor
+        loss_sum = loss_sum / num_batches
+        mse_sum = mse_sum / num_batches
+        # print("step", loss_sum, mse_sum)
+        return loss_sum, mse_sum  # return float, not tensor
 
     def validate(self, dataloader):
         num_batches = len(dataloader)
-        val_loss = 0.0
+        val_loss, val_mse = 0.0, 0.0
         with torch.no_grad():
             for X, y in dataloader:
                 X, y = X.to(self.device), y.to(self.device)
                 pred = self.model(X)
                 val_loss += self.loss_fn(pred, y).item()
+                val_mse += self.metric_fn(pred, y).item()
 
         val_loss /= num_batches
-        val_mse = self.metric_fn(pred, y).item()
+        val_mse /= num_batches
         # print("validate", val_loss, val_mse)
         return val_loss, val_mse
 
     def train(self, train_dataloader, val_dataloader):
-        his = {'loss': [], 'mse': [], 'val_loss': [], 'val_mse': []}
+        his = {'loss': [], 'mse': [], 'val_loss': [], 'val_mse': []}  # lives on CPU
         logging.info("Training started.\n")
 
         for it in range(self.epochs):
@@ -154,22 +157,22 @@ plt.savefig(f"./training-loss_{SLURM_JID}.png")
 
 """
 Save the model params
+
+Comment out because it looks like the model params are included in the TorchScript.
 """
-print("\n#########################################")
-print(net.model, "\n")
-print("Model's state_dict:")
-for param_tensor in net.model.state_dict():
-    print("\t", param_tensor, "\t", net.model.state_dict()[param_tensor].size())
-torch.save(net.model.state_dict(), MODEL_STATE_DICT_PATH)
-print(f"Save model.state_dict() to {MODEL_STATE_DICT_PATH}\n")
+# print("\n#########################################")
+# print(net.model, "\n")
+# print("Model's state_dict:")
+# for param_tensor in net.model.state_dict():
+#     print("\t", param_tensor, "\t", net.model.state_dict()[param_tensor].size())
+# torch.save(net.model.state_dict(), MODEL_STATE_DICT_PATH)
+# print(f"Save model.state_dict() to {MODEL_STATE_DICT_PATH}\n")
 
 """
 Save the model into TorchScript
-
-Comment out because it does not work on farm well.
-Besides, to save/load TorchScript seems to get large validation error
 """
 print("\n#########################################")
 model_scripted = torch.jit.script(net.model)  # Export to TorchScript
 print("TorchScript: \n", model_scripted.code, "\n", model_scripted.graph)
-model_scripted.save('model_scripted.pt')  # Save the TorchScript
+model_scripted.save(MODEL_TORCH_SCRIPT_PATH)  # Save the TorchScript
+print(f"Save the model's TorchScript to {MODEL_TORCH_SCRIPT_PATH}\n")
