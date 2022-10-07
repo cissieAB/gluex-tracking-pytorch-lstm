@@ -44,22 +44,23 @@ The parameter counts of the layers are taken from the original Keras `model.summ
 
 Table: the results after 100 training epochs
 
-| Exp              | `loss`   | `mse`      | `val_loss` | `val_mse`  | `lr`        |     Time |        `X` size |
-|:-----------------|:---------|:-----------|:-----------|:-----------|:------------|---------:|----------------:|
-| Keras TitanRTX*2 | 0.0015   | 6.8281e-06 | 0.0018     | 7.2508e-06 | 3.7715e-05  | ~15 mins | (1910698, 7, 6) |
-| PyTorch TitanRTX | 0.0015   | 1.5310e-05 | 0.00156    | 1.8632e-05 | 4.4371e-05  | ~50 mins | (2646573, 7, 6) |
-| PyTorch T4       | 0.001056 | 1.7273e-06 | 0.000971   | 2.3378e-06 | 5.22006e-05 | ~60 mins | (2646573, 7, 6) |
+| Exp              | `loss` | `mse`      | `val_loss` | `val_mse`  | `lr`        |     Time | Training `X` size |
+|:-----------------|:-------|:-----------|:-----------|:-----------|:------------|---------:|------------------:|
+| Keras TitanRTX*2 | 0.0015 | 6.8281e-06 | 0.0018     | 7.2508e-06 | 3.7715e-05  | ~15 mins |   (1910698, 7, 6) |
+| PyTorch TitanRTX | 0.0016 | 1.2329e-05 | 0.0017     | 1.2466e-05 | 5.22015e-05 | ~50 mins |   (2646573, 7, 6) |
+| PyTorch T4       | 0.0009 | 2.2070e-06 | 0.00078    | 1.8798e-06 | 6.14125e-05 | ~60 mins |   (2646573, 7, 6) |
 
 
 The code is tested on a single `ifarm` TitanRTX/T4 GPU. Results are available at:
 - [./res/training-loss](./res/training-loss): images of the losses along the training process.
 - [./res/job-log](./res/job-log): the detailed job logs. An example of
- how losses are changed along the epochs, batches and time is [here](./res/job-log/train-full_65238781_TitanRTX.log).
+ how losses are changed along the epochs, batches and time is [here](./res/job-log/TitanRTX_training-full_65549066.log).
 - [./res/evaluation](./res/evaluation): images of the evaluation results. [This](./res/evaluation/cmp.md) is
  a comparison between the evaluation errors with Epochs=1 and Epochs=100.
 
-### C++ Inference
-- [ ] Load the TorchScript of the trained model by Python.
+## TODOs
+- [ ] Use C++ to load the TorchScript of the model trained by Python. Test the inference accuracy.
+- [ ] A100 libtorch error. Find the reason why the Python code cannot run on A100 (while cpp can).
 
 ## References
 - Keras APIs: https://keras.io/api/

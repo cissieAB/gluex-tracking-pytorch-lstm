@@ -4,12 +4,12 @@ https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_
 
 Observed differences:
 - The training dataset is larger than that in the referred demonstrated jupyter notebook.
-- Looks like the referred Keras notebook runs faster than this code :(. Larger dataset might be a reason, but there
- should be more.
+- Looks like the referred Keras notebook runs ~2 times faster than this code :(.
+ Larger dataset might be a reason, but there should be more.
 
 Some notes:
 - Tested on a single TitanRTX or a single T4.
-  1 TitanRTX takes ~50 minutes to complete the training process.
+  1 TitanRTX takes ~50 minutes to complete the training process. T4 takes ~60 mins.
 - Tested on farm A100 GPU but failed. It says requiring higher version of libtorch.
 
 mailto: xmei@jlab.org, 10/05/2022
