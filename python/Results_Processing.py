@@ -10,8 +10,7 @@ import logging
 import torch
 from matplotlib import pyplot as plt
 
-from utils import validation_dataloader, DATA_DIM, BATCH_SIZE, HIDDEN_DIM, LSTMNetwork, \
-    MODEL_STATE_DICT_PATH, MODEL_TORCH_SCRIPT_PATH
+from utils import validation_dataloader, DATA_DIM, BATCH_SIZE, MODEL_TORCH_SCRIPT_PATH
 
 SLURM_JID = os.getenv('SLURM_JOB_ID') if os.getenv('SLURM_JOB_ID') else 'current'
 logging.basicConfig(
@@ -24,6 +23,8 @@ logging.basicConfig(
 
 """
 Load model via model.state_dict
+
+No need since we are loading TorchScript now.
 """
 # model = LSTMNetwork(DATA_DIM, HIDDEN_DIM)
 # model.load_state_dict(torch.load(MODEL_STATE_DICT_PATH))
@@ -84,10 +85,10 @@ for i in range(6):
 fig.text(0.5, 0.04, 'Difference between predictions and truth', ha='center')
 fig.text(0.04, 0.5, 'Percentage counts (%)', va='center', rotation='vertical')
 plt.subplots_adjust(left=0.1)
-plt.savefig(f"./evaluation-error-percentage_{SLURM_JID}.png")
+plt.savefig(f"./evaluation_{SLURM_JID}.png")
 
 """
-Interesting error if we do not batch the validation dataset.
+Interesting memory error if we do not batch the validation dataset.
 
 On TitanRTX
 # CUDA out of memory. Tried to allocate 11.04 GiB (GPU 0; 23.65 GiB total capacity; 18.20 GiB already allocated;

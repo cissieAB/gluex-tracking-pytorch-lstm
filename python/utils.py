@@ -1,4 +1,3 @@
-
 """
 - Load the data from "train.csv" and wrap it into the batched training and validation PyTorch dataloaders.
 - Define the NN structure.
