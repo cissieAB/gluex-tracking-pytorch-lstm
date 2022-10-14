@@ -1,0 +1,314 @@
++ srun nvidia-smi
+Fri Oct 21 00:13:11 2022       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.57.02    Driver Version: 470.57.02    CUDA Version: 11.4     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla T4            Off  | 00000000:2C:00.0 Off |                    0 |
+| N/A   27C    P8     9W /  70W |      0MiB / 15109MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
++ env
+SLURM_NODELIST=sciml2102
+REMOTEHOST=login1.jlab.org
+SLURM_LUSTRE_JOB_ID=sciml2102,xmei,66294131
+SLURM_JOB_NAME=lstm-train
+XDG_SESSION_ID=28810
+SLURMD_NODENAME=sciml2102
+SLURM_TOPOLOGY_ADDR=sciml2102
+HOSTNAME=sciml2102
+SLURM_PRIO_PROCESS=0
+SLURM_NODE_ALIASES=(null)
+HOST=ifarm1901.jlab.org
+TERM=xterm-256color
+SHELL=/bin/tcsh
+SLURM_JOB_QOS=normal
+TMPDIR=/tmp
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SSH_CLIENT=129.57.52.24 56859 22
+OSNAME=Linux
+QTDIR=/usr/lib64/qt-3.3
+SLURM_JOB_GPUS=0
+QTINC=/usr/lib64/qt-3.3/include
+SSH_TTY=/dev/pts/17
+SLURM_MEM_PER_CPU=4000
+QT_GRAPHICSSYSTEM_CHECKED=1
+ROCR_VISIBLE_DEVICES=0
+SLURM_NNODES=1
+GROUP=ITD
+USER=xmei
+LS_COLORS=rs=0:di=38;5;27:ln=38;5;51:mh=44;38;5;15:pi=40;38;5;11:so=38;5;13:do=38;5;5:bd=48;5;232;38;5;11:cd=48;5;232;38;5;3:or=48;5;232;38;5;9:mi=05;48;5;232;38;5;15:su=48;5;196;38;5;15:sg=48;5;11;38;5;16:ca=48;5;196;38;5;226:tw=48;5;10;38;5;16:ow=48;5;10;38;5;21:st=48;5;21;38;5;15:ex=38;5;34:*.tar=38;5;9:*.tgz=38;5;9:*.arc=38;5;9:*.arj=38;5;9:*.taz=38;5;9:*.lha=38;5;9:*.lz4=38;5;9:*.lzh=38;5;9:*.lzma=38;5;9:*.tlz=38;5;9:*.txz=38;5;9:*.tzo=38;5;9:*.t7z=38;5;9:*.zip=38;5;9:*.z=38;5;9:*.Z=38;5;9:*.dz=38;5;9:*.gz=38;5;9:*.lrz=38;5;9:*.lz=38;5;9:*.lzo=38;5;9:*.xz=38;5;9:*.bz2=38;5;9:*.bz=38;5;9:*.tbz=38;5;9:*.tbz2=38;5;9:*.tz=38;5;9:*.deb=38;5;9:*.rpm=38;5;9:*.jar=38;5;9:*.war=38;5;9:*.ear=38;5;9:*.sar=38;5;9:*.rar=38;5;9:*.alz=38;5;9:*.ace=38;5;9:*.zoo=38;5;9:*.cpio=38;5;9:*.7z=38;5;9:*.rz=38;5;9:*.cab=38;5;9:*.jpg=38;5;13:*.jpeg=38;5;13:*.gif=38;5;13:*.bmp=38;5;13:*.pbm=38;5;13:*.pgm=38;5;13:*.ppm=38;5;13:*.tga=38;5;13:*.xbm=38;5;13:*.xpm=38;5;13:*.tif=38;5;13:*.tiff=38;5;13:*.png=38;5;13:*.svg=38;5;13:*.svgz=38;5;13:*.mng=38;5;13:*.pcx=38;5;13:*.mov=38;5;13:*.mpg=38;5;13:*.mpeg=38;5;13:*.m2v=38;5;13:*.mkv=38;5;13:*.webm=38;5;13:*.ogm=38;5;13:*.mp4=38;5;13:*.m4v=38;5;13:*.mp4v=38;5;13:*.vob=38;5;13:*.qt=38;5;13:*.nuv=38;5;13:*.wmv=38;5;13:*.asf=38;5;13:*.rm=38;5;13:*.rmvb=38;5;13:*.flc=38;5;13:*.avi=38;5;13:*.fli=38;5;13:*.flv=38;5;13:*.gl=38;5;13:*.dl=38;5;13:*.xcf=38;5;13:*.xwd=38;5;13:*.yuv=38;5;13:*.cgm=38;5;13:*.emf=38;5;13:*.axv=38;5;13:*.anx=38;5;13:*.ogv=38;5;13:*.ogx=38;5;13:*.aac=38;5;45:*.au=38;5;45:*.flac=38;5;45:*.mid=38;5;45:*.midi=38;5;45:*.mka=38;5;45:*.mp3=38;5;45:*.mpc=38;5;45:*.ogg=38;5;45:*.ra=38;5;45:*.wav=38;5;45:*.axa=38;5;45:*.oga=38;5;45:*.spx=38;5;45:*.xspf=38;5;45:
+SLURM_JOBID=66294131
+HOSTTYPE=x86_64-linux
+COLUMNS=139
+SLURM_TASKS_PER_NODE=1
+MAIL=/var/spool/mail/xmei
+PATH=/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin
+SLURM_WORKING_CLUSTER=scicomp:enpslurm21:6817:9216:101
+SLURM_CONF=/etc/slurm/slurm.conf
+SLURM_JOB_ID=66294131
+SLURM_CPUS_PER_TASK=8
+SLURM_JOB_USER=xmei
+PWD=/home/xmei/projects/gluex-tracking-pytorch-lstm/python
+CUDA_VISIBLE_DEVICES=0
+LANG=en_US.UTF-8
+MODULEPATH=/usr/share/Modules/modulefiles:/etc/modulefiles
+SLURM_JOB_UID=11066
+LOADEDMODULES=
+KDEDIRS=/usr
+SLURM_NODEID=0
+SLURM_SUBMIT_DIR=/w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python
+SLURM_TASK_PID=15570
+LINES=37
+SLURM_CPUS_ON_NODE=8
+SLURM_PROCID=0
+ENVIRONMENT=BATCH
+SLURM_JOB_NODELIST=sciml2102
+PERL_HOMEDIR=0
+SHLVL=2
+HOME=/home/xmei
+SLURM_LOCALID=0
+OSTYPE=linux
+SLURM_JOB_GID=761
+SLURM_JOB_CPUS_PER_NODE=8
+SLURM_CLUSTER_NAME=scicomp
+SLURM_GTIDS=0
+SLURM_SUBMIT_HOST=ifarm1901.jlab.org
+SLURM_JOB_PARTITION=gpu
+VENDOR=unknown
+MACHTYPE=x86_64
+LOGNAME=xmei
+QTLIB=/usr/lib64/qt-3.3/lib
+CVS_RSH=ssh
+GPU_DEVICE_ORDINAL=0
+SLURM_JOB_ACCOUNT=epsci
+SSH_CONNECTION=129.57.52.24 56859 129.57.70.17 22
+SLURM_JOB_NUM_NODES=1
+MODULESHOME=/usr/share/Modules
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+XDG_RUNTIME_DIR=/run/user/11066
+OSREL=3.10.0-1160.71.1.el7.x86_64
+QT_PLUGIN_PATH=/usr/lib64/kde4/plugins:/usr/lib/kde4/plugins
+_=/usr/bin/env
++ pwd
+/home/xmei/projects/gluex-tracking-pytorch-lstm/python
++ source /etc/profile.d/modules.sh
+++++ /bin/ps -p 15570 -ocomm=
++++ /bin/basename slurm_script
+++ shell=slurm_script
+++ '[' -f /usr/share/Modules/init/slurm_script ']'
+++ . /usr/share/Modules/init/sh
++++ MODULESHOME=/usr/share/Modules
++++ export MODULESHOME
++++ '[' '' = '' ']'
++++ LOADEDMODULES=
++++ export LOADEDMODULES
++++ '[' /usr/share/Modules/modulefiles:/etc/modulefiles = '' ']'
++ module use /apps/modulefiles
+++ /usr/bin/modulecmd sh use /apps/modulefiles
++ eval MODULEPATH=/apps/modulefiles:/usr/share/Modules/modulefiles:/etc/modulefiles ';export' 'MODULEPATH;'
+++ MODULEPATH=/apps/modulefiles:/usr/share/Modules/modulefiles:/etc/modulefiles
+++ export MODULEPATH
++ module load python3
+++ /usr/bin/modulecmd sh load python3
++ eval LD_LIBRARY_PATH=/apps/python3/3.9.7/lib ';export' 'LD_LIBRARY_PATH;LOADEDMODULES=python3/3.9.7' ';export' 'LOADEDMODULES;PATH=/apps/python3/3.9.7/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin' ';export' 'PATH;_LMFILES_=/apps/modulefiles/python3/3.9.7' ';export' '_LMFILES_;'
+++ LD_LIBRARY_PATH=/apps/python3/3.9.7/lib
+++ export LD_LIBRARY_PATH
+++ LOADEDMODULES=python3/3.9.7
+++ export LOADEDMODULES
+++ PATH=/apps/python3/3.9.7/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin
+++ export PATH
+++ _LMFILES_=/apps/modulefiles/python3/3.9.7
+++ export _LMFILES_
++ pip3 install pandas numpy sklearn torch matplotlib
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: pandas in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (1.5.0)
+Requirement already satisfied: numpy in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (1.23.3)
+Requirement already satisfied: sklearn in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (0.0)
+Requirement already satisfied: torch in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (1.12.1)
+Requirement already satisfied: matplotlib in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (3.6.0)
+Requirement already satisfied: pytz>=2020.1 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from pandas) (2022.4)
+Requirement already satisfied: python-dateutil>=2.8.1 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from pandas) (2.8.2)
+Requirement already satisfied: scikit-learn in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from sklearn) (1.1.2)
+Requirement already satisfied: typing-extensions in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from torch) (4.3.0)
+Requirement already satisfied: packaging>=20.0 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (21.3)
+Requirement already satisfied: kiwisolver>=1.0.1 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (1.4.4)
+Requirement already satisfied: pillow>=6.2.0 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (9.2.0)
+Requirement already satisfied: contourpy>=1.0.1 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (1.0.5)
+Requirement already satisfied: pyparsing>=2.2.1 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (3.0.9)
+Requirement already satisfied: fonttools>=4.22.0 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (4.37.4)
+Requirement already satisfied: cycler>=0.10 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from matplotlib) (0.11.0)
+Requirement already satisfied: six>=1.5 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from python-dateutil>=2.8.1->pandas) (1.16.0)
+Requirement already satisfied: scipy>=1.3.2 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from scikit-learn->sklearn) (1.9.1)
+Requirement already satisfied: joblib>=1.0.0 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from scikit-learn->sklearn) (1.2.0)
+Requirement already satisfied: threadpoolctl>=2.0.0 in /w/epsci-sciwork18/xmei/jhub/lib/python3.9/site-packages (from scikit-learn->sklearn) (3.1.0)
+WARNING: You are using pip version 21.2.3; however, version 22.3 is available.
+You should consider upgrading via the '/apps/python3/3.9.7/bin/python3.9 -m pip install --upgrade pip' command.
++ srun python3 LSTM_training.py
+Torch version 1.12.1+cu102
+Training on cuda device
+Epoch    1: loss=0.06511281512587541, mse=0.020313346324440144, val_loss=0.009612776222417884, val_mse=0.0002692789293845949, lr=0.0001
+Epoch    2: loss=0.008685638491670465, mse=0.0002470864279112718, val_loss=0.00806954653095984, val_mse=0.00023315241582430121, lr=0.0001
+Epoch    3: loss=0.007842249465855352, mse=0.00023037056771965886, val_loss=0.007677385067493006, val_mse=0.0002264117710385118, lr=0.0001
+Epoch    4: loss=0.007498106226038746, mse=0.00022516789046540085, val_loss=0.007284481556418102, val_mse=0.00022092277409006936, lr=0.0001
+Epoch    5: loss=0.007596616217940763, mse=0.00022675122945346125, val_loss=0.00753224175688466, val_mse=0.00022473368534497542, lr=0.0001
+Epoch    6: loss=0.007131269821928959, mse=0.00022125413695288877, val_loss=0.007502097239721376, val_mse=0.00022633072998674242, lr=0.0001
+Epoch    7: loss=0.007384169479413223, mse=0.00022382639344282177, val_loss=0.008192794784493532, val_mse=0.00022971181635125462, lr=0.0001
+Epoch    8: loss=0.006851131458319653, mse=0.00021702001958193463, val_loss=0.006651045820822469, val_mse=0.00021413733243440372, lr=0.0001
+Epoch    9: loss=0.00682485351657965, mse=0.0002148814969181403, val_loss=0.006979306223157235, val_mse=0.0002157936133393502, lr=0.0001
+Epoch   10: loss=0.006862880836817059, mse=0.00021114372217401894, val_loss=0.006977678314593587, val_mse=0.00020947629928591517, lr=0.0001
+Epoch   11: loss=0.006944002339968094, mse=0.00020458033222428334, val_loss=0.006343115028347361, val_mse=0.00019332458786122975, lr=0.0001
+Epoch   12: loss=0.0067450783363025655, mse=0.00019067903476183178, val_loss=0.00676379931040914, val_mse=0.00018115195746584822, lr=0.0001
+Epoch   13: loss=0.0063958327052672966, mse=0.00017147635082137485, val_loss=0.006633153941616614, val_mse=0.00016557837328259466, lr=0.0001
+Epoch   14: loss=0.005885425019758334, mse=0.00015021913162443877, val_loss=0.005996135491135564, val_mse=0.0001420662243562473, lr=0.0001
+Epoch   15: loss=0.006010870442397016, mse=0.00013595526648072444, val_loss=0.005777983344822726, val_mse=0.00012807851318242134, lr=0.0001
+Epoch   16: loss=0.0054123446290545605, mse=0.00012205338099111774, val_loss=0.00544318196715423, val_mse=0.00011868900626902672, lr=0.0001
+Epoch   17: loss=0.0054675534193490615, mse=0.00011932742802163457, val_loss=0.006383691194239276, val_mse=0.00012761705565901183, lr=0.0001
+Epoch   18: loss=0.005392339786132921, mse=0.00011667987746477593, val_loss=0.005588721003263227, val_mse=0.0001158083359700048, lr=0.0001
+Epoch   19: loss=0.00537863914038371, mse=0.00011247515155240939, val_loss=0.0052397014737567485, val_mse=0.00011274161537571508, lr=0.0001
+Epoch   20: loss=0.004814801594742576, mse=0.00010377694299843063, val_loss=0.004681509683541318, val_mse=9.896632407244518e-05, lr=0.0001
+Epoch   21: loss=0.004591099288097213, mse=9.80032870206457e-05, val_loss=0.004660413492704252, val_mse=9.684740871997758e-05, lr=0.0001
+Epoch   22: loss=0.0045021788324927465, mse=9.482903140734557e-05, val_loss=0.004460534451094649, val_mse=9.232037182973761e-05, lr=0.0001
+Epoch   23: loss=0.004434157556110191, mse=9.268610756235145e-05, val_loss=0.0045191467495765926, val_mse=9.103537896896343e-05, lr=0.0001
+Epoch   24: loss=0.004818802831104234, mse=9.445919106819135e-05, val_loss=0.005336753199622742, val_mse=9.733735734709067e-05, lr=0.0001
+Epoch   25: loss=0.00477317246750697, mse=9.315289864572277e-05, val_loss=0.004376023983939832, val_mse=8.985368057277382e-05, lr=0.0001
+Epoch   26: loss=0.004740213550294995, mse=9.197156267367994e-05, val_loss=0.004747157708778836, val_mse=9.088774472203343e-05, lr=0.0001
+Epoch   27: loss=0.004540405006225679, mse=8.96826441193983e-05, val_loss=0.0050783133703289265, val_mse=9.524834746440989e-05, lr=0.0001
+Epoch   28: loss=0.004478264442424995, mse=8.873230206387041e-05, val_loss=0.004045434194516242, val_mse=8.41011643168725e-05, lr=0.0001
+Epoch   29: loss=0.004136933265735468, mse=8.588592885147145e-05, val_loss=0.0039585028541763885, val_mse=8.505512395574564e-05, lr=0.0001
+Epoch   30: loss=0.004207240273902966, mse=8.569295770881112e-05, val_loss=0.004614293736103477, val_mse=8.858637658663119e-05, lr=0.0001
+Epoch   31: loss=0.0047472681348968435, mse=8.903205788205742e-05, val_loss=0.004529273243483149, val_mse=8.436670181205835e-05, lr=0.0001
+Epoch   32: loss=0.004420998966497187, mse=8.574623681275829e-05, val_loss=0.004518312304872716, val_mse=8.65999507617057e-05, lr=0.0001
+Epoch   33: loss=0.004345600301398944, mse=8.46439330206068e-05, val_loss=0.004313356168850889, val_mse=8.421043430316302e-05, lr=0.0001
+Epoch   34: loss=0.004412046649123929, mse=8.427699270281668e-05, val_loss=0.004285168348929971, val_mse=8.191461105494312e-05, lr=0.0001
+Epoch   35: loss=0.004258831440068188, mse=8.243357418874297e-05, val_loss=0.004232204263849604, val_mse=8.232644000320397e-05, lr=0.0001
+Epoch 00035: reducing learning rate of group 0 to 8.5000e-05.
+Epoch   36: loss=0.0037958129580606278, mse=7.897538994800673e-05, val_loss=0.003720920443697435, val_mse=7.745500111281323e-05, lr=8.5e-05
+Epoch   37: loss=0.0037622097869707623, mse=7.798398527323597e-05, val_loss=0.003584832486305987, val_mse=7.69748029661249e-05, lr=8.5e-05
+Epoch   38: loss=0.0040329512567886736, mse=7.867130159217165e-05, val_loss=0.004578318664242126, val_mse=8.061970410134248e-05, lr=8.5e-05
+Epoch   39: loss=0.00398277697034986, mse=7.714152659562464e-05, val_loss=0.0036806910677832433, val_mse=7.701777834764442e-05, lr=8.5e-05
+Epoch   40: loss=0.0036098399436794064, mse=7.418720788699359e-05, val_loss=0.0036210773108028707, val_mse=7.2705230827066e-05, lr=8.5e-05
+Epoch   41: loss=0.003957747484303735, mse=7.497628802717247e-05, val_loss=0.00401203243364094, val_mse=7.673366810775015e-05, lr=8.5e-05
+Epoch   42: loss=0.0040039863474746595, mse=7.372477733886529e-05, val_loss=0.004058775456226386, val_mse=7.3874020072909e-05, lr=8.5e-05
+Epoch   43: loss=0.003826104420408663, mse=7.135323400570151e-05, val_loss=0.0036139176624775836, val_mse=6.866074064389742e-05, lr=8.5e-05
+Epoch 00043: reducing learning rate of group 0 to 7.2250e-05.
+Epoch   44: loss=0.0034502640725961715, mse=6.801598620048688e-05, val_loss=0.003514148948353625, val_mse=6.884940889636603e-05, lr=7.225000000000001e-05
+Epoch   45: loss=0.0034717977558575445, mse=6.645108955768485e-05, val_loss=0.0034528564236725925, val_mse=6.5657868765982e-05, lr=7.225000000000001e-05
+Epoch   46: loss=0.0035797639128547056, mse=6.511658859097956e-05, val_loss=0.0033915770916971583, val_mse=6.379858514368473e-05, lr=7.225000000000001e-05
+Epoch   47: loss=0.0033061444949123663, mse=6.177076930903646e-05, val_loss=0.003239203166690226, val_mse=5.990274837305743e-05, lr=7.225000000000001e-05
+Epoch   48: loss=0.0032685126124508326, mse=5.8843409055392205e-05, val_loss=0.003408431085233048, val_mse=5.9286943924338494e-05, lr=7.225000000000001e-05
+Epoch   49: loss=0.00325524551503226, mse=5.550628580608102e-05, val_loss=0.0032650992725807926, val_mse=5.264809510102443e-05, lr=7.225000000000001e-05
+Epoch   50: loss=0.003135441753733196, mse=5.077618817376374e-05, val_loss=0.0030656715093332516, val_mse=4.838464804809051e-05, lr=7.225000000000001e-05
+Epoch   51: loss=0.00305233537586162, mse=4.5632861974032596e-05, val_loss=0.003037829826845729, val_mse=4.177503899966704e-05, lr=7.225000000000001e-05
+Epoch   52: loss=0.0031531533508904392, mse=4.0964024886408834e-05, val_loss=0.0032014827839535374, val_mse=3.8169551492137195e-05, lr=7.225000000000001e-05
+Epoch   53: loss=0.0030781488288618075, mse=3.58532085143897e-05, val_loss=0.002817050097916678, val_mse=3.2584792441746796e-05, lr=7.225000000000001e-05
+Epoch   54: loss=0.0030057042561236424, mse=3.195298619137479e-05, val_loss=0.0033453558690923722, val_mse=3.1726338855313194e-05, lr=7.225000000000001e-05
+Epoch   55: loss=0.002707483036844749, mse=2.912057840387078e-05, val_loss=0.0026486017688246446, val_mse=2.8090522153561705e-05, lr=7.225000000000001e-05
+Epoch   56: loss=0.002823748910778416, mse=2.886334892878687e-05, val_loss=0.003164006484605273, val_mse=3.1095584484748984e-05, lr=7.225000000000001e-05
+Epoch   57: loss=0.002635092209548331, mse=2.7361906128062677e-05, val_loss=0.0025212864945527783, val_mse=2.6999955119586557e-05, lr=7.225000000000001e-05
+Epoch   58: loss=0.002713297108834189, mse=2.7409478670495142e-05, val_loss=0.0026909035442315705, val_mse=2.7454519608538276e-05, lr=7.225000000000001e-05
+Epoch   59: loss=0.0024761643926294935, mse=2.5945725672783006e-05, val_loss=0.002362213281303135, val_mse=2.562154174157846e-05, lr=7.225000000000001e-05
+Epoch   60: loss=0.0025747310924891602, mse=2.618843570522358e-05, val_loss=0.002340840810620044, val_mse=2.4947180827784455e-05, lr=7.225000000000001e-05
+Epoch   61: loss=0.0025962384060233745, mse=2.6046145115027204e-05, val_loss=0.0025613160748246783, val_mse=2.535763107181882e-05, lr=7.225000000000001e-05
+Epoch   62: loss=0.002440717196987988, mse=2.4910701645058688e-05, val_loss=0.0028175668052240386, val_mse=2.6684927340768998e-05, lr=7.225000000000001e-05
+Epoch   63: loss=0.0024612138308036853, mse=2.4873201816851232e-05, val_loss=0.0028245472852882897, val_mse=2.68521794574481e-05, lr=7.225000000000001e-05
+Epoch   64: loss=0.002389103933118206, mse=2.43809722762594e-05, val_loss=0.0025865701066976874, val_mse=2.5075969712852246e-05, lr=7.225000000000001e-05
+Epoch   65: loss=0.002321892226831917, mse=2.402071629495735e-05, val_loss=0.0021030124744304953, val_mse=2.280589276509986e-05, lr=7.225000000000001e-05
+Epoch   66: loss=0.0024382990512791915, mse=2.4361725305180288e-05, val_loss=0.0022062128427415466, val_mse=2.295712124534986e-05, lr=7.225000000000001e-05
+Epoch   67: loss=0.0023088963194577944, mse=2.3612972565208707e-05, val_loss=0.002113282023990912, val_mse=2.3213244051767727e-05, lr=7.225000000000001e-05
+Epoch   68: loss=0.002107803609957335, mse=2.2682091375534056e-05, val_loss=0.0020336645813941586, val_mse=2.232235365951932e-05, lr=7.225000000000001e-05
+Epoch   69: loss=0.002093282002972022, mse=2.2514143049289724e-05, val_loss=0.002323403249386931, val_mse=2.3178325485152262e-05, lr=7.225000000000001e-05
+Epoch   70: loss=0.002474452541549946, mse=2.4167640299008717e-05, val_loss=0.0022463507723218747, val_mse=2.2794230606198615e-05, lr=7.225000000000001e-05
+Epoch   71: loss=0.002244978803174616, mse=2.286714305252249e-05, val_loss=0.002147985657189303, val_mse=2.2453695894873955e-05, lr=7.225000000000001e-05
+Epoch   72: loss=0.002309991606275694, mse=2.313675012489634e-05, val_loss=0.002097455641534003, val_mse=2.1919926898357365e-05, lr=7.225000000000001e-05
+Epoch   73: loss=0.0021031549770563515, mse=2.2146866536006488e-05, val_loss=0.0022008485037946553, val_mse=2.2858315708357142e-05, lr=7.225000000000001e-05
+Epoch   74: loss=0.0023866488338285525, mse=2.346439443147486e-05, val_loss=0.0022332434020264948, val_mse=2.2777385480329263e-05, lr=7.225000000000001e-05
+Epoch 00074: reducing learning rate of group 0 to 6.1413e-05.
+Epoch   75: loss=0.0019042730177120893, mse=2.1390730007641627e-05, val_loss=0.0019513947122237261, val_mse=2.197595834381926e-05, lr=6.141250000000001e-05
+Epoch   76: loss=0.0019307641569941182, mse=2.1448847098760127e-05, val_loss=0.0019971288191030895, val_mse=2.1315808766237655e-05, lr=6.141250000000001e-05
+Epoch   77: loss=0.0020534221202323294, mse=2.1984269703768682e-05, val_loss=0.002046291345723355, val_mse=2.1733504866545427e-05, lr=6.141250000000001e-05
+Epoch   78: loss=0.0018822224311481107, mse=2.1199878516593014e-05, val_loss=0.001974472964926494, val_mse=2.1615514572570852e-05, lr=6.141250000000001e-05
+Epoch   79: loss=0.001952894669634942, mse=2.1448363812777104e-05, val_loss=0.0018166950689558032, val_mse=2.087813552333823e-05, lr=6.141250000000001e-05
+Epoch   80: loss=0.0018588783634973219, mse=2.102928538924781e-05, val_loss=0.0019643118141565393, val_mse=2.1327184732870617e-05, lr=6.141250000000001e-05
+Epoch   81: loss=0.0018568343285867057, mse=2.0973924441573503e-05, val_loss=0.0019469322781193387, val_mse=2.128941818800723e-05, lr=6.141250000000001e-05
+Epoch   82: loss=0.0018427665143245496, mse=2.0881093207874482e-05, val_loss=0.0018056744938907152, val_mse=2.06096668043894e-05, lr=6.141250000000001e-05
+Epoch   83: loss=0.0018324911393038752, mse=2.079620507721773e-05, val_loss=0.0017683784405840472, val_mse=2.0696614553104376e-05, lr=6.141250000000001e-05
+Epoch   84: loss=0.0018179315009019187, mse=2.0695642094446817e-05, val_loss=0.0017374963402408802, val_mse=2.0511785465883765e-05, lr=6.141250000000001e-05
+Epoch   85: loss=0.0019737309499014612, mse=2.1226878037768e-05, val_loss=0.0019103056637206216, val_mse=2.121277387868931e-05, lr=6.141250000000001e-05
+Epoch   86: loss=0.0021004772250694304, mse=2.1588701046513972e-05, val_loss=0.0019264257425951295, val_mse=2.1133335442874275e-05, lr=6.141250000000001e-05
+Epoch   87: loss=0.002033663540228095, mse=2.121090639009249e-05, val_loss=0.0019026663009893763, val_mse=2.0745007271646032e-05, lr=6.141250000000001e-05
+Epoch   88: loss=0.001969624544887943, mse=2.1014593711261045e-05, val_loss=0.0018554059437350626, val_mse=2.08154143594922e-05, lr=6.141250000000001e-05
+Epoch   89: loss=0.0017749957455453803, mse=2.0263174803534832e-05, val_loss=0.0017575115145253022, val_mse=2.0383902796504595e-05, lr=6.141250000000001e-05
+Epoch   90: loss=0.001765383743078835, mse=2.0186094661594548e-05, val_loss=0.0017921440873252656, val_mse=2.0475638660326586e-05, lr=6.141250000000001e-05
+Epoch 00090: reducing learning rate of group 0 to 5.2201e-05.
+Epoch   91: loss=0.0017121681075722539, mse=1.9988799169758608e-05, val_loss=0.001693701914085722, val_mse=1.996321083445555e-05, lr=5.2200625000000005e-05
+Epoch   92: loss=0.0017092224019751893, mse=1.9933034927195776e-05, val_loss=0.0018001065560328496, val_mse=2.0199006460175742e-05, lr=5.2200625000000005e-05
+Epoch   93: loss=0.0018975573774794756, mse=2.047025761809703e-05, val_loss=0.0018426004637729031, val_mse=2.0555583172128977e-05, lr=5.2200625000000005e-05
+Epoch   94: loss=0.0018773316156646621, mse=2.0338586525767012e-05, val_loss=0.0016876329129749106, val_mse=1.999203320995512e-05, lr=5.2200625000000005e-05
+Epoch   95: loss=0.0016669175911547202, mse=1.9638730818717772e-05, val_loss=0.0016823515845586386, val_mse=1.9911228136682024e-05, lr=5.2200625000000005e-05
+Epoch   96: loss=0.0016786709066769338, mse=1.962299361357975e-05, val_loss=0.0015898035267947605, val_mse=1.9734918747120558e-05, lr=5.2200625000000005e-05
+Epoch   97: loss=0.0016726642053250039, mse=1.9549089692910704e-05, val_loss=0.001670512476577238, val_mse=1.967898423964234e-05, lr=5.2200625000000005e-05
+Epoch   98: loss=0.001663649975047385, mse=1.946690612293815e-05, val_loss=0.0015800078993705605, val_mse=1.9481704554807056e-05, lr=5.2200625000000005e-05
+Epoch   99: loss=0.0016568776645209018, mse=1.938645725145292e-05, val_loss=0.001700372984093849, val_mse=1.980673958148906e-05, lr=5.2200625000000005e-05
+Epoch  100: loss=0.0016482779562899195, mse=1.929960836282736e-05, val_loss=0.001618601356595896, val_mse=1.954778672439626e-05, lr=5.2200625000000005e-05
+
+#########################################
+TorchScript: 
+ def forward(self,
+    x: Tensor) -> Tensor:
+  layer_lstm1 = self.layer_lstm1
+  out, _0, = (layer_lstm1).forward__0(x, None, )
+  layer_lstm2 = self.layer_lstm2
+  out0, _1, = (layer_lstm2).forward__0(out, None, )
+  layer_lstm3 = self.layer_lstm3
+  _2 = (layer_lstm3).forward__0(out0, None, )
+  out1, _3, = _2
+  _4 = torch.select(torch.slice(out1), 1, -1)
+  out2 = torch.slice(_4, 1)
+  layer_output = self.layer_output
+  return (layer_output).forward(out2, )
+ 
+ graph(%self : __torch__.utils.LSTMNetwork,
+      %x.1 : Tensor):
+  %27 : int = prim::Constant[value=1]() # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:95:14
+  %26 : int = prim::Constant[value=0]() # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:95:14
+  %25 : int = prim::Constant[value=-1]() # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:95:21
+  %4 : NoneType = prim::Constant()
+  %layer_lstm1 : __torch__.torch.nn.modules.rnn.LSTM = prim::GetAttr[name="layer_lstm1"](%self)
+  %5 : (Tensor, (Tensor, Tensor)) = prim::CallMethod[name="forward__0"](%layer_lstm1, %x.1, %4) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:92:17
+  %out.1 : Tensor, %7 : (Tensor, Tensor) = prim::TupleUnpack(%5)
+  %layer_lstm2 : __torch__.torch.nn.modules.rnn.___torch_mangle_0.LSTM = prim::GetAttr[name="layer_lstm2"](%self)
+  %11 : (Tensor, (Tensor, Tensor)) = prim::CallMethod[name="forward__0"](%layer_lstm2, %out.1, %4) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:93:17
+  %out.5 : Tensor, %13 : (Tensor, Tensor) = prim::TupleUnpack(%11)
+  %layer_lstm3 : __torch__.torch.nn.modules.rnn.___torch_mangle_1.LSTM = prim::GetAttr[name="layer_lstm3"](%self)
+  %17 : (Tensor, (Tensor, Tensor)) = prim::CallMethod[name="forward__0"](%layer_lstm3, %out.5, %4) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:94:17
+  %out.9 : Tensor, %19 : (Tensor, Tensor) = prim::TupleUnpack(%17)
+  %30 : Tensor = aten::slice(%out.9, %26, %4, %4, %27) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:95:14
+  %32 : Tensor = aten::select(%30, %27, %25) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:95:14
+  %out.13 : Tensor = aten::slice(%32, %27, %4, %4, %27) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:95:14
+  %layer_output : __torch__.torch.nn.modules.linear.Linear = prim::GetAttr[name="layer_output"](%self)
+  %out.17 : Tensor = prim::CallMethod[name="forward"](%layer_output, %out.13) # /w/epsci-sciwork18/xmei/projects/gluex-tracking-pytorch-lstm/python/utils.py:98:14
+  return (%out.17)
+
+Save the model's TorchScript to model_scripted.pt
+
++ srun python3 validation_processing.py
+
+###########################################
+Start inference on cuda
+Inference completed.
+
+diff.shape=(661644, 6), l1_loss=0.0016172014296574402
++ mkdir job_66294131
++ mv evaluation_66294131.png training-loss_66294131.png model_scripted.pt inference-full_66294131.log training-full_66294131.log ncu_66294131.out job_66294131
