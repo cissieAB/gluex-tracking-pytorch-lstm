@@ -3,16 +3,16 @@ Mimic the Keras LSTM code at
 https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_v0.1.ipynb
 
 Observed differences:
-- The training dataset is larger than that in the referred demonstrated jupyter notebook.
-- Looks like the referred Keras notebook runs ~2 times faster than this code :(.
- Larger dataset might be a reason, but there should be more.
+- The training dataset is 40% larger than that in the referred jupyter notebook.
+- Looks like the referred Keras notebook runs much faster (2-3 times faster) than this code :(.
+ Larger dataset is a cause, but there should be more.
 
 Some notes:
 - Tested on a single TitanRTX or a single T4.
-  1 TitanRTX takes ~50 minutes to complete the training process. T4 takes ~60 mins.
+  1 TitanRTX takes ~60 minutes to complete the training process. T4 takes ~80 mins.
 - Tested on farm A100 GPU but failed. It says requiring higher version of libtorch.
 
-mailto: xmei@jlab.org, 10/05/2022
+mailto: xmei@jlab.org, 10/20/2022
 """
 
 import logging
@@ -85,7 +85,7 @@ class Net:
             # Back propagation
             self.optimizer.zero_grad()  # reset grad to 0
             cur_loss.backward()
-            nn.utils.clip_grad_value_(self.model.parameters(), clip_value=NN_CLIP_VALUE)
+            nn.utils.clip_grad_value_(self.model.parameters(), clip_value=NN_CLIP_VALUE)  #TODO: what's clip for?
             self.optimizer.step()  # update the model parameters
 
             if batch_id % 100 == 0:  # logging

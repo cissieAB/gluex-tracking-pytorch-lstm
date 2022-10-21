@@ -51,7 +51,7 @@ train_x = np.array(train_x)
 train_y = np.array(train_y)
 # print(train_x.shape, train_y.shape)
 
-# Split the whole set into the training and validation set
+# Split the whole set into the training and validation sets
 train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2)
 train_y = np.squeeze(train_y)
 val_y = np.squeeze(val_y)
@@ -63,7 +63,7 @@ tensor_val_x, tensor_val_y = torch.Tensor(val_x), torch.Tensor(val_y)
 training_set = TensorDataset(tensor_x, tensor_y)
 validation_set = TensorDataset(tensor_val_x, tensor_val_y)
 
-training_dataloader = DataLoader(training_set, batch_size=BATCH_SIZE)
+training_dataloader = DataLoader(training_set, batch_size=BATCH_SIZE, shuffle=True)
 validation_dataloader = DataLoader(validation_set, batch_size=BATCH_SIZE)
 
 

@@ -113,7 +113,6 @@ venv.bak/
 .idea
 job_*
 *.csv
-*/*.csv
-*/*.pt
+*.pt
 .DS_Store
 */.DS_Store
