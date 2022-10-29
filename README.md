@@ -65,7 +65,13 @@ After sequencing, the dimension of the whole training dataset (as on 10/20/2022)
 
 ### TODOs
 - [ ] Use C++ to load the TorchScript of the model trained by Python. Test the inference accuracy.
-- [ ] A100 libtorch error. Find the reason why the Python code cannot run on A100 (while cpp can).
+- [ ] A100 PyTorch error. Find the reason why the Python code cannot run on A100 (while cpp can).
+```
+/home/xmei/.local/lib/python3.6/site-packages/torch/cuda/__init__.py:143: UserWarning: 
+NVIDIA A100 80GB PCIe with CUDA capability sm_80 is not compatible with the current PyTorch installation.
+The current PyTorch install supports CUDA capabilities sm_37 sm_50 sm_60 sm_70.
+If you want to use the NVIDIA A100 80GB PCIe GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
+```
 
 ### References
 - Keras APIs: https://keras.io/api/
