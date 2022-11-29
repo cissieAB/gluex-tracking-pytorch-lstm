@@ -62,16 +62,20 @@ Compared to the dataset at the time of executing the Keras notebook,
 After sequencing, the dimension of the whole training dataset (as on 10/20/2022) is (2646573, 7, 6), with
  each epoch containing ~2108 batches. We train 100 epochs in total.
 
+### A100 support
+Based on my own experience the bare-metal python3.9+pip3 installation would always fail because of
+mismatch cudnn/torch versions. This is solved by installing the latest pytorch via conda. A [conda
+environment file](environment.yml) is also provided.
+
+```bash
+# install pytorch via conda
+conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
+# create conda env from yml file
+conda env create -f environment.yml
+```
 
 ### TODOs
 - [ ] Use C++ to load the TorchScript of the model trained by Python. Test the inference accuracy.
-- [ ] A100 PyTorch error. Find the reason why the Python code cannot run on A100 (while cpp can).
-```
-/home/xmei/.local/lib/python3.6/site-packages/torch/cuda/__init__.py:143: UserWarning: 
-NVIDIA A100 80GB PCIe with CUDA capability sm_80 is not compatible with the current PyTorch installation.
-The current PyTorch install supports CUDA capabilities sm_37 sm_50 sm_60 sm_70.
-If you want to use the NVIDIA A100 80GB PCIe GPU with PyTorch, please check the instructions at https://pytorch.org/get-started/locally/
-```
 
 ### References
 - Keras APIs: https://keras.io/api/
@@ -82,5 +86,5 @@ If you want to use the NVIDIA A100 80GB PCIe GPU with PyTorch, please check the 
   - [Loading a TorchScript model in C++](https://pytorch.org/tutorials/advanced/cpp_export.html)
 
 ---
-Last updated on 10/20/2022 by xmei@jlab.org
+Last updated on 11/28/2022 by xmei@jlab.org
 
