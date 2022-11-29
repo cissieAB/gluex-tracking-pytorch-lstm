@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --gres=gpu:TitanRTX:1
+#SBATCH --gres=gpu:T4:1
 #SBATCH -N 1  # number of nodes
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=4000  # MB
 #SBATCH --partition=gpu
 #SBATCH --mail-type=END,FAIL
-#SBATCH --output=ncu_%j.out
+#SBATCH --output=jlog_%j.out
 #SBATCH --job-name=lstm-train
 
 set -euxo pipefail
@@ -15,12 +15,12 @@ srun nvidia-smi
 
 env
 
-CONDA_DIR=/apps/anaconda3/2021.05/etc/profile.d
+CONDA_DIR=/apps/anaconda3/2021.05/etc/profile.d  # depend on the farm config
 WK_DIR=/home/xmei/projects/gluex-tracking-pytorch-lstm/python
 
-#source /etc/profile.d/modules.sh
-#module use /apps/modulefiles
-#module load anaconda3
+source /etc/profile.d/modules.sh
+module use /apps/modulefiles
+module load anaconda3
 which conda
 conda --version
 
@@ -29,7 +29,7 @@ conda-env list
 pwd
 cd $WK_DIR
 pwd
-source activate a100-torch-env  # "source" instead of "conda"
+source activate a100-torch-env  # "source activate" instead of "conda activate"
 
 srun python LSTM_training.py
 
