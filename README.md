@@ -2,7 +2,7 @@
 
 This repo is to reproduce the GlueX tracking algorithm with PyTorch, which originally implemented with
  TensorFlow Keras [here](https://github.com/nathanwbrei/phasm/blob/main/python/2022.05.29_GlueX_tracking_v0.1.ipynb).
- It is aimed to a future integration with [phasm](https://github.com/nathanwbrei/phasm).
+ It aims to a future integration with [phasm](https://github.com/nathanwbrei/phasm).
 
 
 To the best of my knowledge, mimic everything in the original Keras notebook, including the same:
@@ -22,8 +22,8 @@ To the best of my knowledge, mimic everything in the original Keras notebook, in
 ## Configurations
 
 ### Conda PyTorch environment
-Based on my own experience, the bare-metal python3.9+pip3+cudnn8.6 installation would always fail on A100
-because of mismatch cudnn/torch versions. This is solved by installing the latest pytorch (as of Nov-28-2022)
+Based on my own experience, the bare-metal python3.9+pip3+cudnn8.6 installation would always fail on JLab ifarm A100
+GPU nodes because of mismatch cudnn/torch versions. This is solved by installing the latest pytorch (as of Nov-28-2022)
 via conda virtual environments as guided [here](https://pytorch.org/get-started/locally/).
 A [conda environment file](environment.yml) is provided to show my environment configurations.
 
@@ -89,5 +89,5 @@ The code is tested on a single `ifarm` TitanRTX/T4/A100 GPU. Results are availab
   - [Loading a TorchScript model in C++](https://pytorch.org/tutorials/advanced/cpp_export.html)
 
 ---
-Last updated on 12/01/2022 by xmei@jlab.org
+Last updated on 02/01/2023 by xmei@jlab.org
 
