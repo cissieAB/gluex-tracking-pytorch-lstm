@@ -29,7 +29,9 @@ conda-env list
 pwd
 cd $WK_DIR
 pwd
-source activate a100-torch-env  # "source activate" instead of "conda activate"
+# A100 GPU requires higher CUDA version than the ifarm default
+# This env is tested in Nov, 2022 and was working
+source activate pytorch-cuda11_6  # "source activate" instead of "conda activate"
 
 srun python LSTM_training.py
 
